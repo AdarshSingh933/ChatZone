@@ -1,5 +1,8 @@
 import './App.css';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import io from "socket.io-client";
+
+const socket = io.connect("http://localhost:3001");
 
 const ChatApp = () => {
   const [message, setMessage] = useState('');
@@ -20,15 +23,48 @@ const ChatApp = () => {
       likes: 0
     };
     
-    setMessages([...messages, newMessage]);
+    // Emit the entire messages array to the server
+    socket.emit("send_message", { messages: [...messages, newMessage] });
+
+    // No need to update local state here as the message will be received from the server
     setMessage('');
   };
 
   const handleLike = (index) => {
-    const newLikes = { ...likes };
-    newLikes[index] = (newLikes[index] || 0) + 1;
-    setLikes(newLikes);
+    // Increment the like count for the specific message index
+    const updatedLikes = { ...likes };
+    updatedLikes[index] = (updatedLikes[index] || 0) + 1;
+    
+    // Emit the updated like count to the server
+    socket.emit("send_likes", { index, likes: updatedLikes[index] });
+    
   };
+  
+  
+  useEffect(() => {
+    socket.on("receive_message", (data) => {
+      // Ensure data.messages is always an array before updating the local state
+      if (Array.isArray(data.messages)) {
+        setMessages(data.messages);
+      }
+    });
+    socket.on("receive_likes", (data) => {
+      // Update the local state with the received likes
+      setLikes((prevLikes) => ({
+        ...prevLikes,
+        [data.index]: data.likes // Update the specific like count for the given index
+      }));
+    });
+  
+
+    // Add error handling for socket connection and data receiving
+    socket.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
+    });
+    socket.on("error", (error) => {
+      console.error("Socket error:", error);
+    });
+  }, []);
 
   return (
     <div>
@@ -60,6 +96,7 @@ const ChatApp = () => {
             onChange={(e) => setMessage(e.target.value)} 
             placeholder="Type your message..."
           />
+          <button type="submit">Send</button>
         </form>
       </div>
     </div>
