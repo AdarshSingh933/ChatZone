@@ -1,0 +1,40 @@
+.App {
+  text-align: center;
+}
+.chat-container{
+    width: 70%;
+    margin: auto;
+    background-color: #f1dcd9;
+    border-radius: 10px;
+    min-height: 100vh;
+}
+.chat-container button{
+  position: relative;
+  top: 12px;
+}
+.chat-box{
+  position: fixed;
+  bottom: 2px;
+  left: 19%;
+  width: 100%;
+}
+.chat-box input{
+  width: 57%;
+  height: 30px;
+}
+.short-name{
+  margin-right: 10px;
+  font-weight: bold;
+  color: rgb(7, 94, 84);
+  text-transform: uppercase;
+  height: 30px;
+  width: 30px;
+  border: 2px solid black;
+  top: -17px;
+  position: relative;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #c3a0a0;
+}
